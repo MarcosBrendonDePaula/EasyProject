@@ -16,13 +16,13 @@ import java.util.Scanner;
  * @author MarcosB
  */
 public class nsocket {
-    private static int contador=0;
+    private static int contador = 0;
     private int id=contador;
     private Socket Cliente;
-    private String Entrada     ="";
+    private String Entrada     = "";
     //private String Saida;
     private PrintStream saida;
-    public static int refresh  =1000;
+    public static int refresh  = 1000;
     private int status=0;
     private Thread Proc;
     private Scanner entrada;
@@ -55,26 +55,15 @@ public class nsocket {
                 System.out.println("Erro Ao Criar stream de Entrada");
                 return;
             }            
-            String et="";
-            while(status!=1){
+            while(true){
                 try{
-                    et=entrada.nextLine();
-                    Buffer.add(et);
+                    Buffer.add(entrada.nextLine());
                     EasyMultServer.OrdemDeChegada.add(id);
                 }catch(Exception e){
                     System.out.println("Ocorreu uma perda de conexao ID:"+id);
                     Cliente=null;
                     EasyMultServer.removerID(id);
-                    status=1;
-                    Proc.stop();
-//                    EasyMultServer.ConectadosID.add(id);
-                    try {
-                        this.finalize();
-                    } catch (Throwable ex) {
-                        System.out.println("Erro Ao tentar Finalizar a Execulsao id: "+id);
-                        entrada.close();
-                        saida.close();
-                    }
+                    return;
                 }
             }
         }
@@ -120,16 +109,6 @@ public class nsocket {
     public void setStatus(int Status){
         status=Status;
     }
-//    /**
-//     * Seta A menssagem No buffer de entrada Do Cliente;
-//     * Seta A menssagem No Buffer de saida Do Servidor;
-//     * @param Menssagem String - Menssagem A ser Enviada
-//     * @deprecated 
-//     */
-//    public void setSaida(String Menssagem){
-//        Saida=Menssagem;
-//        saida.println(Saida);
-//    }
     /**
      * Enviar uma menssagem para o servidor ou para o cliente;
      * Entrada somente em String, retorna True caso Envie;
@@ -165,7 +144,6 @@ public class nsocket {
      */
     public String getEntrada(){
         if(!Buffer.isEmpty()&&Entrada.equals("")){
-            System.out.println("Quantidade em Fila:"+(Buffer.size()-1));
             Entrada=Buffer.getFirst();
             Buffer.removeFirst();
         }
