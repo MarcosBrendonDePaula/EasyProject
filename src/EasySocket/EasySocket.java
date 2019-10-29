@@ -33,7 +33,7 @@ public class EasySocket {
     private boolean novo=false;
     private Thread Proc;
     private Scanner entrada;
-    private LinkedList<String> Buffer=new LinkedList();
+    public LinkedList<String> Buffer=new LinkedList();
     /**
      * No parametro tipo voce deve informar:
      *        0 Para servidor
@@ -127,31 +127,16 @@ public class EasySocket {
     private final Runnable Verificar=new Runnable() {
         @Override
         public void run() {
-            System.out.println("Verificador Inicializado");
             try {
                 entrada= new Scanner(Cliente.getInputStream());
-            } catch (IOException ex) {
-                System.out.println("Erro Ao Criar A porta de Escuta");
-                return;
-            }
-            String et="";// buffer Local de entrada
-            while(status!=1){
-                try{
-                    et=entrada.nextLine();
-                    if(Entrada.equals("")&&Buffer.isEmpty()){
-                        Entrada=et;
-                        novo=true;
-                    }else{
-                        Buffer.add(et);
-                    }
-                }catch(Exception e){
-                    status=0;
-                    System.out.println("Desconectado");
-                    entrada.close();
-                    saida.close();
-                    Proc.stop();
+                while(true){
+                    Buffer.add(entrada.nextLine());
                 }
-            }
+            } catch (Exception ex) {
+                System.out.println("Desconectado");
+                Cliente=null;
+                return;
+            }            
         }
     };
     /**
@@ -166,7 +151,7 @@ public class EasySocket {
      * @return String
      */
     public String getET(){
-        return Entrada;
+        return Buffer.getFirst();
     }
     /**
      * Espera por uma conexao interna ou externa Modo servidor
@@ -251,16 +236,12 @@ public class EasySocket {
      * @return String
      */
     public String getEntrada(){
-        if(!Buffer.isEmpty()&&Entrada.equals("")){
-            Entrada=Buffer.get(0);
-            Buffer.remove(0);            
-            System.out.println("Quantidade em Fila:"+Buffer.size());          
-            novo=true;
+        if(!Buffer.isEmpty()){
+            String msg = Buffer.getFirst();
+            Buffer.removeFirst();
+            return msg;
         }
-        String ET=Entrada;
-        Entrada="";
-        novo=false;
-        return ET;
+        return "?";
     }
     /**
      * Encerrar a comunicação no modo cliente
