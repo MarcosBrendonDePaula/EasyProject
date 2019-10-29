@@ -6,7 +6,6 @@
  */
 package EasySocket;
 
-import java.awt.Label;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -23,7 +22,6 @@ public class EasyMultServer {
     private ServerSocket server;
     public Thread T1;
     static boolean on=false;
-    Label erro = new Label("Erro");
     /**
      * Funçao executada apos a ativaçao caso queira mudala faça uma sobrecarga de metodo
      * @param Aceitado - Conexao Aceitada 
@@ -53,24 +51,28 @@ public class EasyMultServer {
             Socket acept=null;
             while(true){
                 System.out.println("Aguardando conexoes "+getServer().getLocalPort());
+            try {
+                acept = getServer().accept();
+                System.out.println("Aceita");
+            } catch (IOException ex) {
+                System.out.println("erro");
+            }
+            if(acept==null)
+                return;
+                nsocket cnovo;
                 try {
-                    acept = getServer().accept();
-                    if(acept == null){
-                        System.out.println("erro Ao aceitar Conexão");
-                    }else{
-                        nsocket cnovo = new nsocket(acept);
-                        System.out.println("conexao:"+acept.getInetAddress()+" Porta:"+acept.getPort()+" Id:"+cnovo.getId());
-                        Conecxoes.add(cnovo);
-                        ConectadosID.add(cnovo.getId());
-                        funçaoExtra(cnovo);
-                    }
+                    cnovo = new nsocket(acept);
                 } catch (IOException ex) {
-                    System.out.println("erro Ao aceitar Conexão de modo geral");
+                    System.out.println("Erro Fatal Socket Incompleto");
+                    return;
                 }
+                System.out.println("conexao:"+acept.getInetAddress()+" Porta:"+acept.getPort()+" Id:"+cnovo.getId());
+                Conecxoes.add(cnovo);
+                ConectadosID.add(cnovo.getId());
+                funçaoExtra(cnovo);
             }
         }
     };
-    
     /**
      * Inicializa O servidor
      */

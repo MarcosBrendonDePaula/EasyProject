@@ -19,11 +19,15 @@ public class nsocket {
     private static int contador = 0;
     private int id=contador;
     private Socket Cliente;
+    private String Entrada     = "";
+    //private String Saida;
     private PrintStream saida;
+    public static int refresh  = 1000;
+    private int status=0;
     private Thread Proc;
     private Scanner entrada;
     private LinkedList<String> Buffer=new LinkedList();
-    
+    //private LinkedList<Object> objetos=new LinkedList<>();
     /**
      * Informe o socket(c) para que o cliente com o socket (c) seja criado
      * @param c - Cliente Nsocket Conectado
@@ -47,16 +51,21 @@ public class nsocket {
         public void run() {
             try {
                 entrada= new Scanner(Cliente.getInputStream());
-                while(true){
-                    Buffer.add(entrada.nextLine());
-                    EasyMultServer.OrdemDeChegada.add(id);
-                }
-            } catch (Exception ex) {
-                System.out.println("Ocorreu uma perda de conexao ID:"+id);
-                Cliente=null;
-                EasyMultServer.removerID(id);
+            } catch (IOException ex) {
+                System.out.println("Erro Ao Criar stream de Entrada");
                 return;
             }            
+            while(true){
+                try{
+                    Buffer.add(entrada.nextLine());
+                    EasyMultServer.OrdemDeChegada.add(id);
+                }catch(Exception e){
+                    System.out.println("Ocorreu uma perda de conexao ID:"+id);
+                    Cliente=null;
+                    EasyMultServer.removerID(id);
+                    return;
+                }
+            }
         }
     };
     /**
@@ -66,6 +75,7 @@ public class nsocket {
         entrada.close();
         saida.close();
         Proc.stop();
+        status=1;
     }
     
      /**
@@ -83,6 +93,23 @@ public class nsocket {
         return Buffer;
     }
     /**
+     * Setar Um tempo de espera de uma verificacao de recebimento de informaçao a outra.
+     * Quanto Maior O tempo de espera Menor a Ultilização do processador.
+     * Parametro informado em MILISEGUNDOS.
+     * @param Range int - Parametro informado em MILISEGUNDOS
+     */
+    public void setRefreshRate(int Range){
+        refresh=Range;
+    }
+    /**
+     * Para Ativar ou desativar A verificaçao de menssagem;
+     * 0 Para Ativado, 1 Para Desativado;
+     * @param Status int - Ligado ou Desligado 0 ou 1
+     */
+    public void setStatus(int Status){
+        status=Status;
+    }
+    /**
      * Enviar uma menssagem para o servidor ou para o cliente;
      * Entrada somente em String, retorna True caso Envie;
      * @param Menssagem String - Menssagem A ser Enviada
@@ -91,19 +118,22 @@ public class nsocket {
         saida.println(Menssagem);
     }
     /**
-     * Seta Um nivel de Prioridade Na Thread De verificaçao. 
+     * Seta Um nivel de Prioridade Na Thread De verificaçao.
+     * @deprecated 
      */
     public void SetMinPriority(){
         Proc.setPriority(Thread.MIN_PRIORITY);
     }
     /**
      * Seta Um nivel de Prioridade Na Thread De verificaçao.
+     * @deprecated 
      */
     public void SetNorPriority(){
         Proc.setPriority(Thread.NORM_PRIORITY);
     }
     /**
      * Seta Um nivel de Prioridade Na Thread De verificaçao.
+     * @deprecated 
      */
     public void SetMaxPriority(){
         Proc.setPriority(Thread.MAX_PRIORITY);
@@ -113,12 +143,13 @@ public class nsocket {
      * @return String
      */
     public String getEntrada(){
-        if(!Buffer.isEmpty()){
-            String x = Buffer.getFirst();
+        if(!Buffer.isEmpty()&&Entrada.equals("")){
+            Entrada=Buffer.getFirst();
             Buffer.removeFirst();
-            return x;
-        }else
-            return "?";
+        }
+        String ET=Entrada;
+        Entrada="";
+        return ET;
     }
     /**
      * Retorna a Id Da conexao Atual
@@ -127,13 +158,21 @@ public class nsocket {
     public int getId(){
         return id;
     }
-    
+     /**
+     * retorna uma copia da entrada atual sem a remover
+     * é funcional mas recomendamos que ultilize o copyEntrada
+     * @deprecated
+     * @return String
+     */
+    public String ET(){
+        return Entrada;
+    }
      /**
      * retorna uma copia da entrada atual sem a remover
      * @return String
      */
     public String copyEntrada(){
-        return Buffer.getFirst();
+        return Entrada;
     }
     /**
      * Para quem saber manipular Thread essa função retorna a Thread de verificaçao do Socket
