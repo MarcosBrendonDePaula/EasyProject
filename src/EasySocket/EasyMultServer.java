@@ -1,3 +1,4 @@
+
 /**
  * Classe Criada Para Tornar mais Facil a Criaçao e execução de um socket
  * Criado Por Marcos Brendon De Paula

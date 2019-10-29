@@ -59,13 +59,8 @@ public class nsocket {
             while(status!=1){
                 try{
                     et=entrada.nextLine();
-                    if(Entrada.equalsIgnoreCase("")){
-                        Entrada=et;
-                        EasyMultServer.OrdemDeChegada.add(id);
-                    }else{
-                        Buffer.add(et);
-                        EasyMultServer.OrdemDeChegada.add(id);
-                    }
+                    Buffer.add(et);
+                    EasyMultServer.OrdemDeChegada.add(id);
                 }catch(Exception e){
                     System.out.println("Ocorreu uma perda de conexao ID:"+id);
                     Cliente=null;
