@@ -6,8 +6,8 @@
  */
 package EasySocket;
 
-import java.awt.Label;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.LinkedList;
@@ -23,7 +23,6 @@ public class EasyMultServer {
     private ServerSocket server;
     public Thread T1;
     static boolean on=false;
-    Label erro = new Label("Erro");
     /**
      * Funçao executada apos a ativaçao caso queira mudala faça uma sobrecarga de metodo
      * @param Aceitado - Conexao Aceitada 
@@ -78,7 +77,7 @@ public class EasyMultServer {
        T1=new Thread(accept);
        T1.setPriority(Thread.MIN_PRIORITY);
        T1.start();
-        System.out.println("Inicializado");
+       System.out.println("Inicializado");
     }
     /**
      * Retorna O nsocket que tenha a ID especifica 
